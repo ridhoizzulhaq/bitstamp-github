@@ -1,0 +1,10 @@
+# ~/.ngrok2/ngrok.yml
+authtoken: 2z9Z8vbWYZENc6DwTT3eOoK8JPV_2WdiyXYDmHaGe7ayw8vgS  # jika belum, daftar di ngrok.com lalu 'ngrok config add-authtoken ...'
+
+tunnels:
+  frontend:
+    addr: 3000
+    proto: http
+  backend:
+    addr: 8787
+    proto: http
