@@ -1,70 +1,136 @@
-# Getting Started with Create React App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# Bitstamp
 
-## Available Scripts
+Bitstamp is a proof-of-provenance NFT application designed to capture, verify and monetize authentic media. By combining on-device photo capture, embedded GPS/timestamp metadata, IPFS storage and an EIP-712-based NFT minting flow, Bitstamp delivers an immutable, publicly verifiable record of every image’s origin. 
 
-In the project directory, you can run:
+Bitstamp is deployed on Citrea Testnet and now is develop for WaveGack
 
-### `npm start`
+---
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## 📖 Overview
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+1. **Capture**  
+   - Live photo taken in-browser (desktop) or via file input (mobile).  
+   - Immediately tag with `latitude,longitude` and UNIX timestamp.
 
-### `npm test`
+2. **Pin to IPFS**  
+   - Photo blob → pinned via Pinata → returns an IPFS CID.  
+   - JSON metadata (name, description, image URI, attributes) → pinned → metadata CID.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+3. **Lazy-Mint as NFT**  
+   - Frontend requests an EIP-712 “voucher” signed by a backend wallet.  
+   - User submits voucher + signature to the `BitstampNFT` contract’s `redeem` function.  
+   - Contract verifies signature, prevents replay, mints ERC-721 token with the metadata URI.
 
-### `npm run build`
+4. **Verify & Embed**  
+   - Anyone can call `tokenURI(tokenId)` → retrieve IPFS JSON → verify location/time/image.  
+   - Embed snippet:
+     ```html
+     <a href="https://your-app.com/view/4" target="_blank" rel="noopener">
+       <img src="https://gateway.ipfs/<CID>" alt="NFT #4" />
+     </a>
+     ```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+5. **Tipping**  
+   - On the NFT detail page, viewers can send ETH tips directly to the NFT owner’s address.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+---
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## ⚙️ Tech Stack
 
-### `npm run eject`
+- **Frontend**  
+  - React + Create React App  
+  - HTML5 MediaDevices & Geolocation APIs  
+  - Bootstrap (layout & components)  
+  - ethers.js v6 (BrowserProvider, Contract, EIP-712 signing)  
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+- **Backend / Proxy**  
+  - Node.js + Express  
+  - pinata-sdk + multer (IPFS pinning)  
+  - cors, dotenv, stream (Readable)  
+  - ethers.js Wallet (voucher signing)
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+- **Smart Contract**  
+  - Solidity ^0.8.17  
+  - OpenZeppelin ERC721URIStorage & EIP712 + ECDSA  
+  - Lazy-mint via `NFTVoucher` + `redeem`  
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+- **Infrastructure / Dev Tools**  
+  - IPFS (decentralized file storage) via Pinata.cloud  
+  - ngrok or Cloudflare Tunnel (HTTPS for local dev)  
+  - MetaMask (wallet & signer)  
+  - Git / GitHub (source control)  
+  - VS Code (editor)  
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+- **Standards & Protocols**  
+  - HTTP(S), REST for API endpoints  
+  - JSON-RPC (Ethereum node communication)  
+  - EIP-712 (secure off-chain message signing)  
+  - ERC-721 (NFT metadata URI standard)  
 
-## Learn More
+---
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## 🚀 Quickstart
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### 1. Backend
 
-### Code Splitting
+1. Copy `.env.example` → `.env`, fill in:
+   ```
+   PINATA_API_KEY=…
+   PINATA_SECRET_API_KEY=…
+   BACKEND_PRIVATE_KEY=…      # voucher signer wallet
+   CHAIN_ID=…                 # e.g. 80001 for Polygon Mumbai
+   NFT_CONTRACT_ADDRESS=…     # deployed BitstampNFT address
+   ```
+2. Install & start:
+   ```bash
+   cd server
+   npm install
+   npm start
+   ```
+3. Verify health:
+   ```bash
+   curl http://localhost:8787/ping
+   ```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+### 2. Frontend
 
-### Analyzing the Bundle Size
+1. Copy `.env.example` → `.env`, fill in:
+   ```
+   REACT_APP_BACKEND=http://localhost:8787
+   REACT_APP_NFT_CONTRACT=0x...
+   ```
+2. Install & start:
+   ```bash
+   cd client
+   npm install
+   npm start
+   ```
+3. Open `http://localhost:3000` in your browser.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+### 3. Deploy Smart Contract
 
-### Making a Progressive Web App
+1. Compile & deploy `BitstampNFT` (e.g. via Remix or Hardhat).  
+2. Note the deployed address and update `.env` accordingly.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+---
 
-### Advanced Configuration
+## 🛠️ Usage
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+1. **Capture Photo**  
+   - Desktop: grant camera & geolocation → click **Capture Photo**.  
+   - Mobile: use file input → grant geolocation.
 
-### Deployment
+2. **Upload & Preview**  
+   - Enter optional caption → **Upload & Preview**.  
+   - Preview IPFS-hosted image + metadata URI appears.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+3. **Mint NFT**  
+   - Click **Mint NFT** → MetaMask popup → confirm transaction.  
+   - On success, you’ll see the transaction hash.
 
-### `npm run build` fails to minify
+4. **View & Tip**  
+   - Navigate to NFT detail (e.g. `/view/4`), view image, metadata, and owner.  
+   - Enter ETH amount → **Tip** → directly reward the creator.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+---
