@@ -1,7 +1,7 @@
 
 # Bitstamp
 
-##Demo Video : https://www.youtube.com/watch?v=S_jlvszppgI&feature=youtu.be
+### Demo Video : https://www.youtube.com/watch?v=S_jlvszppgI&feature=youtu.be
 
 Bitstamp is a proof-of-provenance NFT application designed to capture, verify and monetize authentic media. By combining on-device photo capture, embedded GPS/timestamp metadata, IPFS storage and an EIP-712-based NFT minting flow, Bitstamp delivers an immutable, publicly verifiable record of every image’s origin. 
 
